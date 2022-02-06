@@ -75,7 +75,7 @@ const ListVideos = ( props ) => {
                               <img src={ playIcon } alt="play video icon" />
                             </div>
                           </CardContent>
-                          <Typography className={ classes.videoTitle }>{video.thumbnail_name}</Typography>
+                          <Typography className={ classes.videoTitle }>{video.thumbnail_name.replace(/_|.png/g, " ")}</Typography>
                         </Paper>
                       </Grid>
                     ) )
