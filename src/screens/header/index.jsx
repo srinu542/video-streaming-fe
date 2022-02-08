@@ -9,10 +9,11 @@ import PropTypes from 'prop-types';
 function Header(props) {
   const { classes, title } = props;
   return (
-    <Typography className={ classes.heading } variant="h2" component="h2">
+    <Typography className={ classes.heading } data-testid = "header" variant="h2" component="h2">
       <div className={ classes.playHover }>
         <img src={ playIcon } alt="play video icon" />
-      </div>Videos Streaming -{''} {title}
+      </div>
+      <span>Videos Streaming - {title}</span>
     </Typography>
   ); 
 }

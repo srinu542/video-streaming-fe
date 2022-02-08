@@ -30,12 +30,15 @@ const styles = ( ) => ( {
     '& a': {
       float: 'right',
       fontSize: '13px',
-      background: '#0AA7F7',
+      display: 'flex',
+      alignItems: 'center',
+      background: '#32BEA6',
       color: '#fff',
       padding: '10px 12px',
       borderRadius: '50px',
       letterSpacing: '1px',
-      boxShadow: '0px 0px 5px #0EF7F750',
+      textTransform: 'uppercase',
+      boxShadow: '0px 0px 5px #32BEA650',
       position: 'fixed',
       bottom: '0',
       right: '0',
@@ -44,6 +47,10 @@ const styles = ( ) => ( {
       cursor: 'pointer',
       textDecoration: 'none',
       transition: 'all 0.5s ease-in-out',
+      '& span':{
+        paddingLeft: '5px',
+        paddingTop: '3px',
+      },
       '&:hover': {
         transform: 'scale(1.1)',
       },

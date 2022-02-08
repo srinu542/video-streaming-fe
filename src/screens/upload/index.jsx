@@ -15,7 +15,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import Header from '../header'
 
 // Read Service url from env file
-const API_URL = "http://localhost:3030";
+const API_URL = process.env.APP_SERVER_BASE_URL || "http://localhost:3030";
 
 const UploadVideo = ( props ) => {
   const { classes, history } = props;
@@ -26,15 +26,23 @@ const UploadVideo = ( props ) => {
   const [video, setVideo] = React.useState( undefined );
   const [file, setFile] = React.useState();
 
-  const dropVideo = async ( file ) => {
+  const inputFile = React.useRef( null );
+
+  const triggerInput = () => {
+    inputFile.current.click();
+  };
+
+
+  const dropVideo = async ( e ) => {
+    const file = e.target.files[0];
     setVideo( undefined );
     setErrorMessage( undefined );
     const videoo = file;
     const readFile = new FileReader();
     setFile(file)
     if ( !videoo ) return;
-    if ( videoo.size >= 30000000 ) {
-      setErrorMessage( 'File size must be less than 30MB.' );
+    if ( file.size >= 30000000 ) {
+      setErrorMessage( 'File size below 30MB accepted.' );
     } else {
       await readFile.readAsDataURL( videoo );
       readFile.onload = async ( file ) => {
@@ -96,15 +104,20 @@ const UploadVideo = ( props ) => {
           </Typography>
           ) )
         }
-        <label
-          htmlFor="contained-button-file"
-        >
-          <StyledDropZone 
-            accept="video/*"
-            onDrop={dropVideo}
-            label={video !== undefined && video.name !== undefined ? video.name : 'Click or drop your file here'}
-          />
-        </label>
+
+        <div className={ `${classes.uploadBox} ${errorMessage !== '' && classes.marginTop}` }>
+          <div onClick={ triggerInput } className={ classes.uploadBorder }>
+            <i className="las la-file-video" />
+            <div className={ classes.uploadBtn }>
+              {/* Trigger file input when click on below span */}
+              <span role="button" aria-hidden="true">
+                <input data-testid="uploadFile" accept="video/*" type="file" ref={ inputFile } onChange={ dropVideo } />
+                <p>Click to browse the video</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        
         {' '}
         {
           ( video && (
@@ -146,8 +159,9 @@ const UploadVideo = ( props ) => {
         }
       </Paper>
       <Typography className={ classes.title } variant="h2" component="h2">
-        <Link to="/" title="home page link">
+        <Link data-testid = "home-page-link" to="/" title="home page link">
           <HomeIcon/>
+          <span>Home</span>
         </Link>
       </Typography>
     </div>
