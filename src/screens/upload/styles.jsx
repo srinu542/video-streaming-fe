@@ -98,6 +98,11 @@ const styles = ( theme ) => ( {
       },
     },
   },
+  Button: {
+    background: '#32BEA6',
+    color: '#FFFFFF',
+    fontWeight: '600',
+  }
 } );
 
 export default styles;

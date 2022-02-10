@@ -17,7 +17,7 @@ import { Paper } from '@mui/material';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import Header from '../header'
 
-const API_URL = process.env.APP_SERVER_BASE_URL || "http://localhost:3030";
+const API_URL = "http://localhost:3030";
 
 const ListVideos = ( props ) => {
   const { classes } = props;
@@ -25,7 +25,6 @@ const ListVideos = ( props ) => {
   const [videoList, setVideoList] = React.useState();
   const [videLink, setVideoLink] = React.useState( '' );
   const [loading, setLoading] = React.useState( true );
-  const [error, setError] = React.useState('')
 
   useEffect( () => {
     // GET request For videos list
@@ -33,12 +32,7 @@ const ListVideos = ( props ) => {
       .then( ( response ) => {
         setLoading( false );
         setVideoList( response.data );
-        setError("");
-      } ).catch( ( error ) => {
-        setLoading( false );
-        setVideoList("");
-        setError(error);
-      });
+      } )
   }, [] );
 
   // Play Video in dialog box
@@ -71,7 +65,7 @@ const ListVideos = ( props ) => {
                             component="img"
                             height="180"
                             image={`${API_URL}/uploads/thumbnails/${video.thumbnail_name}`}
-                            alt={video.thumbnail_name}
+                            alt="thumbnails"
                             className={ classes.img}
                           />
                           <div className={ classes.playHover }>
@@ -93,14 +87,6 @@ const ListVideos = ( props ) => {
           )}
         </Container>
       </div>
-      {
-        error && (
-          <div className={ classes.noData } data-testid="error">
-            <span><i className="las la-exclamation-triangle" /></span>
-            <p>Something went wrong .</p>
-          </div>
-        )
-      }
       {/* Play video popup */}
       <Dialog
         open={ videLink !== undefined && videLink !== '' }
@@ -109,6 +95,7 @@ const ListVideos = ( props ) => {
         aria-describedby="alert-dialog-description"
         maxWidth="sm"
         className={ classes.videoDialog }
+        data-testid="video-popup"
         scroll="body"
       >
         <DialogActions>
@@ -119,7 +106,7 @@ const ListVideos = ( props ) => {
 
         <DialogContent>
           <video controls autoPlay>
-            <source src={ videLink.link.toString() ? videLink.link.toString() : ""}/>
+            <source src={ videLink.link.toString()}/>
           </video>
         </DialogContent>
       </Dialog>

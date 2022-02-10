@@ -1,10 +1,10 @@
-import {render, screen, cleanup, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import {render, screen, waitForElementToBeRemoved, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect'
-import userEvent from '@testing-library/user-event';
-import { rest, MockedResponse } from 'msw';
+import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { BrowserRouter } from 'react-router-dom';
 import Home from '../screens/home/index';
+import userEvent from '@testing-library/user-event';
 
 const API_URL = process.env.APP_SERVER_BASE_URL || 'http://localhost:3030';
 
@@ -61,7 +61,7 @@ const MockHomeComponent = () => {
         </BrowserRouter>
     );
 }
-describe('Home page view render testing', () => {
+describe('Home page testing the behavior the user would see in the browser', () => {
     test('should render header in home', async () => {
         render(<MockHomeComponent/>)
         const heading = screen.getByRole( 'heading' );
@@ -74,6 +74,38 @@ describe('Home page view render testing', () => {
         expect( uploadButton ).toHaveAttribute( 'title', 'upload video page link' );
         expect( uploadButton ).toHaveAttribute( 'href', '/upload' );
     })
+    
+    test( 'should render home page and Test for Play', async () => {
+      render( <MockHomeComponent /> );
+      await waitForElementToBeRemoved( () => screen.queryByRole( 'progressbar' ) );
+      const playButton = screen.getAllByRole( 'img', { name: /thumbnails/i } );
+      userEvent.click( playButton[0] );
+      expect( screen.getByRole( 'presentation' ) ).toBeInTheDocument();
+      const stopButton = screen.getByTestId( 'video-popup' );
+      userEvent.click( stopButton );
+    } );
+    
+    test( 'should render home page and Close Play poup outside click', async () => {
+        render( <MockHomeComponent /> );
+        await waitForElementToBeRemoved( () => screen.queryByRole( 'progressbar' ) );
+        const playButton = screen.getAllByRole( 'img', { name: /thumbnails/i } );
+        userEvent.click( playButton[0] );
+        expect( screen.getByRole( 'presentation' ) ).toBeInTheDocument();
+        fireEvent.keyDown( screen.getByRole( 'presentation' ), {
+          key: 'Escape',
+          code: 'Escape',
+          keyCode: 27,
+          charCode: 27,
+        } );
+    } );
+    test( 'should render home page and Close Play poup on click close', async () => {
+        render( <MockHomeComponent /> );
+        await waitForElementToBeRemoved( () => screen.queryByRole( 'progressbar' ) );
+        const playButton = screen.getAllByRole( 'img', { name: /thumbnails/i } );
+        userEvent.click( playButton[0] );
+        expect( screen.getByRole( 'presentation' ) ).toBeInTheDocument();
+        fireEvent.click( screen.getByTestId( 'CloseIcon' ) );
+    } );
 });
 
 describe( 'Home page API testing', function () {
@@ -87,7 +119,7 @@ describe( 'Home page API testing', function () {
         server.use(empty_data_response)
         render(<MockHomeComponent/>)
         await waitForElementToBeRemoved( () => screen.queryByRole( 'progressbar' ) );
-        const noData = screen.queryByTestId( /no-data/ );
+        const noData = screen.queryByTestId( "no-data" );
         expect(noData).toBeInTheDocument();
     });
     test( 'Render page when error response in getVideoThumbnails API call', async () => {
@@ -98,4 +130,5 @@ describe( 'Home page API testing', function () {
         expect(error).toBeNull();
     });
     
+
 })
