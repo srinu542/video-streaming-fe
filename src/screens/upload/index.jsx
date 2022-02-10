@@ -9,13 +9,12 @@ import styles from './styles';
 import Pageloader from '../loader';
 import { Link } from 'react-router-dom';
 import { Button, Paper} from '@material-ui/core';
-import { StyledDropZone } from 'react-drop-zone'
 import 'react-drop-zone/dist/styles.css'
 import HomeIcon from '@mui/icons-material/Home';
 import Header from '../header'
 
 // Read Service url from env file
-const API_URL = process.env.APP_SERVER_BASE_URL || "http://localhost:3030";
+const API_URL = "http://localhost:3030";
 
 const UploadVideo = ( props ) => {
   const { classes, history } = props;
@@ -40,8 +39,7 @@ const UploadVideo = ( props ) => {
     const videoo = file;
     const readFile = new FileReader();
     setFile(file)
-    if ( !videoo ) return;
-    if ( file.size >= 30000000 ) {
+    if ( file.size >= ( 30 * 1024 * 1024 ) ) {
       setErrorMessage( 'File size below 30MB accepted.' );
     } else {
       await readFile.readAsDataURL( videoo );
@@ -61,33 +59,19 @@ const UploadVideo = ( props ) => {
   const uploadVideo = async ( file ) => {
     if ( file !== undefined ) {
       const fileData = file;
-      const filename = fileData.name;
-      const parts = filename.split( '.' );
-      const extension = parts[parts.length - 1];
-      const fileExtensions = ['mp4', 'avi', 'mov', 'mpg', '3gp', '3g2', 'ogv', 'mkv', 'wmv', 'webm', 'flv'];
-      if ( fileExtensions.indexOf( extension.toLowerCase() ) === -1 ) { // Checking file type
-        setErrorMessage( 'Sorry, this file type is not permitted. You can only upload video files' );
-      } else {
-        const filesize = fileData.size;
-        const videoSize = filesize / 1024 / 1024;
-        if ( videoSize <= 100 ) { // Checking File size
-          setLoading( true );
-          const data = new FormData();
-          data.append( 'video', fileData );
-          // Uplaod video api
-          await axios.post( `${API_URL}/uploadVideo`, data )
-            .then( ( res ) => {
-              setLoading( false );
-              setMessage('File Uploaded Success.');
-              history.push( '/' );
-            } ).catch( () => {
-              setLoading( false );
-              setErrorMessage( 'Something went wrong, please try after sometime' );
-            } );
-        } else {
-          setErrorMessage( 'Make sure your video file is not exceeding 100 MB and try to upload again.' );
-        }
-      }
+      setLoading( true );
+      const data = new FormData();
+      data.append( 'video', fileData );
+      // Uplaod video api
+      await axios.post( `${API_URL}/uploadVideo`, data )
+      .then( ( res ) => {
+        setLoading( false );
+        setMessage('File Uploaded Success.');
+        history.push( '/' );
+      } ).catch( () => {
+        setLoading( false );
+        setErrorMessage( 'Something went wrong, please try after sometime' );
+      } );
     }
   };
   return (
@@ -97,7 +81,7 @@ const UploadVideo = ( props ) => {
         { loading && <Pageloader/>}
         {
           ( errorMessage && (
-          <Typography variant="body1">
+          <Typography variant="body1" data-testid="error">
             {' '}
             { errorMessage }
             {' '}
@@ -121,7 +105,7 @@ const UploadVideo = ( props ) => {
         {' '}
         {
           ( video && (
-            <div className={classes.videoPreviewBox}>
+            <div className={classes.videoPreviewBox} data-testid="video-preview">
               <div className={classes.metedata}>
                 <Typography>
                   <Typography className={classes.titleHeading} component="span">Name: </Typography>
@@ -153,7 +137,7 @@ const UploadVideo = ( props ) => {
                 <track />
                 <source src={video.sources[0]} />
               </video>
-              <Button type="submit" variant="contained" color="primary" onClick={() => uploadVideo(file)}>Upload</Button>
+              <Button type="submit" variant="contained" className = {classes.Button} data-testid="upload-file-api" onClick={() => uploadVideo(file)}>Upload</Button>
             </div>
           ) )
         }
